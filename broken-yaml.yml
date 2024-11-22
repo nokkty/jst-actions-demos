@@ -4,17 +4,15 @@ on:
   push:
     branches:
       - main
-      paths:
+    paths:
         - 'docs/**'
   pull_request:
     branches:
       - main
-      paths:
-        - '!docs/**'
 
 jobs:
   build:
-    runs-on: ubunt-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -51,11 +49,11 @@ jobs:
 
     - name: Run linter
       run: npm run lint
-          env:
+        env:
           CI: true
 
   deploy:
-    runs-on: windows-latest 
+    runs-on: ubuntu-latest 
     needs: build
 
     steps:
@@ -73,5 +71,6 @@ jobs:
     steps:
     - name: Notify team
       run: echo "Deployment complete"
-      env: SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      env: 
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
