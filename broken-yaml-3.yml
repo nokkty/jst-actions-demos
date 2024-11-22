@@ -9,18 +9,41 @@ on:
       - main
 
 jobs:
-  build_node10_ubuntu:
+  build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [10, 12, 14, 16, 18]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - node-version: 10
+            os: ubuntu-latest
+          - node-version: 12
+            os: windows-latest
+          - node-version: 14
+            os: macos-latest
+          - node-version: 16
+            os: ubuntu-latest
+          - node-version: 18
+            os: windows-latest
+        exclude:
+          - node-version: 16
+            os: windows-latest
+          - node-version: 18
+            os: macos-latest
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Node.js 10
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '10'
+        node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
       run: npm ci
+      env:
+        NODE_ENV: production
 
     - name: Run tests
       run: npm test
@@ -32,255 +55,53 @@ jobs:
       env:
         NODE_ENV: production
 
-  build_node12_ubuntu:
+  lint:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [10, 12, 14, 16, 18]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Node.js 12
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '12'
+        node-version: ${{ matrix.node-version }}
 
     - name: Install dependencies
       run: npm ci
 
-    - name: Run tests
-      run: npm test
+    - name: Run linter
+      run: npm run lint
       env:
         CI: true
 
-    - name: Build
-      run: npm run build
+  deploy:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deploy to production
+      run: npm run deploy
       env:
         NODE_ENV: production
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    - name:
+      run: echo "This step is missing a name"
 
-  build_node14_ubuntu:
+  notify:
     runs-on: ubuntu-latest
+    needs: [build, lint, deploy]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 14
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
+    - name: Notify team
+      run: echo "Deployment complete"
       env:
-        CI: true
-
-    - name: Build
-      run: npm run build
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    - name: Notify team again
+      run: echo "Deployment complete again"
       env:
-        NODE_ENV: production
-
-  build_node16_ubuntu:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 16
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node10_windows:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 10
-      uses: actions/setup-node@v2
-      with:
-        node-version: '10'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node12_windows:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 12
-      uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node14_windows:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 14
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node16_windows:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 16
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node10_macos:
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 10
-      uses: actions/setup-node@v2
-      with:
-        node-version: '10'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node12_macos:
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 12
-      uses: actions/setup-node@v2
-      with:
-        node-version: '12'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node14_macos:
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 14
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
-
-  build_node16_macos:
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Node.js 16
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run tests
-      run: npm test
-      env:
-        CI: true
-
-    - name: Build
-      run: npm run build
-      env:
-        NODE_ENV: production
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
