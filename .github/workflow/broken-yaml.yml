@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-        - 'docs/**'
+      - 'docs/**'
   pull_request:
     branches:
       - main
-  workflow_dispach:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,8 +27,8 @@ jobs:
 
     - name: Run tests
       run: npm test
-        env:
-          CI: true
+      env:
+        CI: true
 
     - name: Build
       run: npm run build
@@ -50,8 +50,8 @@ jobs:
 
     - name: Run linter
       run: npm run lint
-        env:
-          CI: true
+      env:
+        CI: true
 
   deploy:
     runs-on: ubuntu-latest 
