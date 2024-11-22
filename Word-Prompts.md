@@ -13,7 +13,9 @@ Problem Statement: Create a GitHub Actions workflow to ensure that your Python a
 5. Testing with Different Compiler Versions
 Problem Statement: Design a GitHub Actions workflow to test your C/C++ application with different compiler versions. The workflow should build and run tests using GCC versions 7, 8, and 9, as well as Clang versions 7 and 8. Use a matrix strategy to run the tests in parallel across these compiler versions.
 
-6. Create a CI/CD workflow file that will:
+6. Walk through the lab: [CICD-Lab](https://github.com/githubabcs/gh-abcs-actions/blob/main/labs/lab07.md)
+
+7. Create a CI/CD workflow file that will:
 Trigger on push and pull requests to main branch, as well as a manual trigger,
 Run on linux version v2.321.0,
 Install and run npm tests and builds,
